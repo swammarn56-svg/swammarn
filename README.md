@@ -1,38 +1,24 @@
-# Bakery ERP — v14.0.0 Clean Foundation
+# Bakery ERP v14 — Item Dashboard Module
 
-## GitHub structure
+This ZIP replaces the previous foundation files with a working Item Dashboard connected to Supabase.
 
-- `index.html`
-- `css/style.css`
-- `js/app.js`
-- `js/config.js`
-- `js/supabase.js`
-- `js/utils.js`
-- `supabase/schema.sql`
-- `supabase/rls.sql`
-- `supabase/seed.sql`
-- `manifest.webmanifest`
-- `sw.js`
+## Before opening the app
 
-## Supabase
+1. `schema.sql` and `rls.sql` should already have been run in Supabase.
+2. Create a user in Supabase Authentication → Users.
+3. Sign in from the app using that account.
+4. Add an item and verify it appears in the `items` table.
 
-Run `supabase/schema.sql`, then `supabase/rls.sql` in Supabase SQL Editor.
+## Item rules
 
-The frontend uses only the public publishable key. Never add a secret/service-role key.
+- Base unit is `g` or `pcs`.
+- Purchase unit can be `g`, `kg`, `pcs`, `box`, or `pack`.
+- `unit_factor_to_base` stores the conversion to the item's base unit.
+- Sale/Production/Packaging flags are stored on the item.
+- Deactivation keeps historical rows while removing the item from active workflows.
+- The next Order module should query only `sale_enabled = true` items.
 
-## Business rules already reserved in the architecture
+## Security
 
-- Sale-enabled items are the source for the Order item list.
-- Orders connect to Recipe.
-- Recipe drives Production/Packaging issued quantities.
-- Purchase quantity is normalized to a base unit.
-- Purchase stores a historical cost snapshot.
-- Weighted average cost is available for valuation.
-- Inventory is ledger-oriented.
-- Monthly closing stores Used, Damage, Closing and Sales total values.
-- Closing can be locked.
-- Item Dashboard is a dedicated destination.
-
-## Important
-
-This release is the clean foundation, not the final feature-complete ERP. The transactional modules will be implemented on top of this schema so that stock and valuation calculations remain consistent.
+Only the Supabase publishable key is shipped to the browser. Do not add a service-role/secret key.
+The current RLS policies require authenticated users. Role-specific policies should be tightened before production.

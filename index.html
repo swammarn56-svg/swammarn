@@ -1,47 +1,100 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#111827">
-  <meta name="description" content="Bakery ERP">
-  <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="stylesheet" href="./css/style.css">
-  <title>Bakery ERP</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="stylesheet" href="./css/style.css">
+<title>Bakery ERP</title>
 </head>
 <body>
-  <header class="topbar">
-    <div><strong>Bakery ERP</strong><small>v14.0.0</small></div>
-    <span id="connectionStatus" class="status">Checking…</span>
-  </header>
+<header class="topbar">
+  <div><strong>Bakery ERP</strong><small>v14.0.0 · Item Module</small></div>
+  <div class="top-actions"><span id="connectionStatus" class="status">Checking…</span><button id="logoutBtn" class="ghost hidden">Logout</button></div>
+</header>
 
-  <main id="app">
+<main id="app">
+  <section id="authView" class="auth-card hidden">
+    <h1>Sign in</h1>
+    <p class="muted">Use a Supabase Auth account to access the ERP.</p>
+    <form id="loginForm">
+      <label>Email<input id="email" type="email" autocomplete="email" required></label>
+      <label>Password<input id="password" type="password" autocomplete="current-password" required minlength="6"></label>
+      <button type="submit" class="primary">Sign in</button>
+      <p id="authMessage" class="message"></p>
+    </form>
+  </section>
+
+  <section id="mainView" class="hidden">
     <section class="hero">
-      <h1>Bakery ERP</h1>
-      <p>Supabase foundation for Items, Purchases, Orders, Production, Packaging, Sales and Inventory.</p>
+      <div>
+        <h1>Item Dashboard</h1>
+        <p class="muted">Manage the master item list used by Purchase, Sale, Order, Recipe, Production and Packaging.</p>
+      </div>
+      <button id="addItemBtn" class="primary">+ Add Item</button>
     </section>
 
-    <section class="grid">
-      <button data-view="items">Item Dashboard</button>
-      <button data-view="purchases">Purchase</button>
-      <button data-view="orders">Orders</button>
-      <button data-view="production">Production</button>
-      <button data-view="packaging">Packaging</button>
-      <button data-view="sales">Sales</button>
-      <button data-view="reports">Reports</button>
+    <section class="toolbar">
+      <input id="searchInput" type="search" placeholder="Search item name, code or category…">
+      <select id="statusFilter">
+        <option value="all">All Items</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+        <option value="sale">Sale Enabled</option>
+        <option value="production">Production Enabled</option>
+        <option value="packaging">Packaging Enabled</option>
+      </select>
+      <button id="refreshBtn">Refresh</button>
     </section>
 
-    <section id="view" class="panel"></section>
-  </main>
+    <section id="stats" class="stats"></section>
+    <section id="itemsTable" class="table-card"></section>
+  </section>
+</main>
 
-  <nav class="bottom-nav" aria-label="Primary navigation">
-    <button data-view="dashboard">Dashboard</button>
-    <button data-view="purchases">Purchase</button>
-    <button data-view="orders">Orders</button>
-    <button data-view="sales">Sale</button>
-    <button data-view="more">More</button>
-  </nav>
+<nav id="bottomNav" class="bottom-nav hidden">
+  <button data-view="dashboard">Dashboard</button>
+  <button data-view="purchases">Purchase</button>
+  <button data-view="orders">Orders</button>
+  <button data-view="sales">Sale</button>
+  <button data-view="more">More</button>
+</nav>
 
-  <script type="module" src="./js/app.js"></script>
+<dialog id="itemDialog">
+  <form id="itemForm" method="dialog" class="dialog-card">
+    <div class="dialog-head"><h2 id="dialogTitle">Add Item</h2><button type="button" id="closeDialog" class="icon">×</button></div>
+    <input id="itemId" type="hidden">
+    <div class="form-grid">
+      <label>Name*<input id="itemName" required maxlength="150"></label>
+      <label>Item Code<input id="itemCode" maxlength="50"></label>
+      <label>Category<input id="itemCategory" maxlength="80"></label>
+      <label>Base Unit*
+        <select id="baseUnit" required><option value="g">g</option><option value="pcs">pcs</option></select>
+      </label>
+      <label>Purchase Unit*
+        <select id="purchaseUnit" required><option value="g">g</option><option value="kg">kg</option><option value="pcs">pcs</option><option value="box">box</option><option value="pack">pack</option></select>
+      </label>
+      <label>Unit → Base Factor*
+        <input id="unitFactor" type="number" min="0.000001" step="0.000001" value="1" required>
+        <small class="muted">Example: kg → g = 1000</small>
+      </label>
+      <label>Minimum Stock<input id="minStock" type="number" min="0" step="0.0001" value="0"></label>
+    </div>
+    <div class="checks">
+      <label><input id="saleEnabled" type="checkbox"> Sale Enabled</label>
+      <label><input id="productionEnabled" type="checkbox"> Production Enabled</label>
+      <label><input id="packagingEnabled" type="checkbox"> Packaging Enabled</label>
+      <label><input id="active" type="checkbox" checked> Active</label>
+    </div>
+    <p id="formMessage" class="message"></p>
+    <div class="dialog-actions">
+      <button type="button" id="cancelBtn">Cancel</button>
+      <button type="submit" class="primary">Save Item</button>
+    </div>
+  </form>
+</dialog>
+
+<script type="module" src="./js/app.js"></script>
 </body>
 </html>
