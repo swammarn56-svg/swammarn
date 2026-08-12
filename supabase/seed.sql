@@ -1,0 +1,4 @@
+-- Optional starter data.
+-- Example:
+-- insert into public.items(name,code,base_unit,purchase_unit,unit_factor_to_base,sale_enabled)
+-- values ('Example Cake','CAKE-001','pcs','pcs',1,true);
