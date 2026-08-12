@@ -16,3 +16,7 @@ Phase 2 adds the Sales/Reports layer and separates Production and Packaging into
 
 ## Important
 The supplied schema already contains separate operation_type values (`production` and `packaging`) and fields for issued, return, damage, used and closing. It also contains sales/sale_lines and monthly closing fields.
+
+
+## Phase 2 FIXED
+This build fixes JavaScript parse/runtime blockers in Purchase confirmation, Order issue, and Production/Packaging row saving. The previous build could make every navigation button appear unresponsive because `await` was used inside non-async functions.
