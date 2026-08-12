@@ -1,0 +1,1 @@
+No additional migration is required for the Phase 1 UI against the supplied schema. Existing tables: items, purchases, recipes, recipe_lines, orders, order_lines, daily_operations, inventory_ledger.
