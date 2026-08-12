@@ -1,23 +1,60 @@
 <!doctype html>
-<html lang="en">
+<html lang="my">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#111827"><link rel="manifest" href="./manifest.webmanifest">
-<link rel="stylesheet" href="./css/style.css"><title>Bakery ERP · Phase 1</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="stylesheet" href="./css/style.css">
+<title>Bakery ERP · Phase 2</title>
 </head>
 <body>
-<header class="topbar"><div><strong>Bakery ERP</strong><small>Phase 1 · Core Operations</small></div>
-<div class="top-actions"><span id="connectionStatus" class="status">Checking…</span><button id="logoutBtn" class="ghost hidden">Logout</button></div></header>
+<header class="topbar">
+  <div><strong>Bakery ERP</strong><small id="appSubtitle">Phase 2 · Sales & Reports</small></div>
+  <div class="top-actions"><button id="langBtn" class="ghost">မြန်မာ</button><span id="connectionStatus" class="status">Checking…</span><button id="logoutBtn" class="ghost hidden">Logout</button></div>
+</header>
+
 <main>
-<section id="authView" class="auth-card hidden"><h1>Sign in</h1><p class="muted">Supabase Auth account required.</p>
-<form id="loginForm"><label>Email<input id="email" type="email" required></label><label>Password<input id="password" type="password" required></label><button class="primary">Sign in</button><p id="authMessage" class="message"></p></form></section>
+<section id="authView" class="auth-card hidden">
+  <h1 data-i18n="signIn">Sign in</h1>
+  <p class="muted" data-i18n="authRequired">Supabase Auth account required.</p>
+  <form id="loginForm">
+    <label data-i18n="email">Email<input id="email" type="email" required></label>
+    <label data-i18n="password">Password<input id="password" type="password" required></label>
+    <button class="primary" data-i18n="signIn">Sign in</button>
+    <p id="authMessage" class="message"></p>
+  </form>
+</section>
+
 <section id="mainView" class="hidden">
-<div class="hero"><div><h1 id="pageTitle">Item Dashboard</h1><p id="pageSub" class="muted">Master items used across the core workflow.</p></div><button id="primaryAction" class="primary">+ Add Item</button></div>
-<nav class="tabs" id="tabs">
-<button data-page="items" class="active">Items</button><button data-page="purchases">Purchase</button><button data-page="recipes">Recipes</button><button data-page="orders">Orders</button><button data-page="operations">Production / Packaging</button><button data-page="inventory">Inventory</button>
-</nav>
-<section id="content"></section>
-</section></main>
-<dialog id="dialog"><form id="form" class="dialog-card"><div class="dialog-head"><h2 id="dialogTitle"></h2><button type="button" id="closeDialog" class="icon">×</button></div><div id="formBody"></div><p id="formMessage" class="message"></p><div class="dialog-actions"><button type="button" id="cancelDialog">Cancel</button><button class="primary">Save</button></div></form></dialog>
+  <div class="hero">
+    <div><h1 id="pageTitle"></h1><p id="pageSub" class="muted"></p></div>
+    <button id="primaryAction" class="primary"></button>
+  </div>
+  <nav class="tabs" id="tabs">
+    <button data-page="dashboard">Dashboard</button>
+    <button data-page="items">Item Dashboard</button>
+    <button data-page="purchases">Purchase</button>
+    <button data-page="recipes">Recipe</button>
+    <button data-page="orders">Order</button>
+    <button data-page="production">Production</button>
+    <button data-page="packaging">Packaging</button>
+    <button data-page="sales">Sale</button>
+    <button data-page="reports">Reports</button>
+    <button data-page="more">More</button>
+  </nav>
+  <section id="content"></section>
+</section>
+</main>
+
+<dialog id="dialog">
+<form id="form" class="dialog-card">
+  <div class="dialog-head"><h2 id="dialogTitle"></h2><button type="button" id="closeDialog" class="icon">×</button></div>
+  <div id="formBody"></div><p id="formMessage" class="message"></p>
+  <div class="dialog-actions"><button type="button" id="cancelDialog" data-i18n="cancel">Cancel</button><button class="primary" data-i18n="save">Save</button></div>
+</form>
+</dialog>
+
 <script type="module" src="./js/app.js"></script>
-</body></html>
+</body>
+</html>
