@@ -55,26 +55,65 @@
 </form>
 </dialog>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-<script src="./js/config.js" defer></script>
-<script src="./js/utils.js" defer></script>
-<script src="./js/supabase.js" defer></script>
-<script src="./js/app.js" defer></script>
 <script>
 (function(){
-  window.setTimeout(function(){
-    var s=document.getElementById("connectionStatus");
-    if(s && /Checking|Loading/.test(s.textContent||"")){
-      s.textContent="JavaScript/Supabase မတက်ပါ — browser refresh လုပ်ပါ";
-      s.className="status danger-text";
-      var main=document.getElementById("mainView");
-      if(main && main.classList.contains("hidden")){
-        var a=document.getElementById("authView");
-        if(a && a.classList.contains("hidden")) a.classList.remove("hidden");
+  var status=document.getElementById("connectionStatus");
+  var failed=false;
+  function setStatus(text, danger){
+    if(status){status.textContent=text; if(danger) status.className="status danger-text";}
+  }
+  function loadScript(src, cb, timeout){
+    var s=document.createElement("script");
+    s.src=src;
+    s.async=true;
+    var done=false;
+    var timer=setTimeout(function(){
+      if(done)return; done=true; s.remove(); cb(new Error("Timeout loading "+src));
+    }, timeout||7000);
+    s.onload=function(){if(done)return;done=true;clearTimeout(timer);cb(null)};
+    s.onerror=function(){if(done)return;done=true;clearTimeout(timer);s.remove();cb(new Error("Failed loading "+src))};
+    document.head.appendChild(s);
+  }
+  function loadChain(){
+    loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2", function(err){
+      if(err){
+        setStatus("Supabase CDN 1 မရ — fallback စမ်းနေသည်…", true);
+        return loadScript("https://unpkg.com/@supabase/supabase-js@2", function(err2){
+          if(err2)return fail("Supabase SDK မတက်ပါ။ Internet/CDN ကိုစစ်ပါ။");
+          startApp();
+        });
       }
+      startApp();
+    });
+  }
+  function startApp(){
+    if(!window.supabase || !window.supabase.createClient){
+      return fail("Supabase SDK မတွေ့ပါ။");
     }
-  }, 8000);
+    var list=["./js/config.js","./js/utils.js","./js/supabase.js","./js/app.js"];
+    function next(i){
+      if(i>=list.length)return;
+      loadScript(list[i], function(err){
+        if(err)return fail("File မတက်ပါ: "+list[i]);
+        next(i+1);
+      });
+    }
+    next(0);
+  }
+  function fail(msg){
+    failed=true;
+    setStatus(msg,true);
+    var a=document.getElementById("authView");
+    if(a)a.classList.remove("hidden");
+    var m=document.getElementById("mainView");
+    if(m)m.classList.add("hidden");
+  }
+  setTimeout(function(){
+    if(!window.bakerySupabase && !window.supabase && !failed){
+      setStatus("JavaScript/Supabase မတက်ပါ — network/CDN ကိုစစ်ပါ", true);
+    }
+  },12000);
+  loadChain();
 })();
 </script>
 </body>
-</html>
