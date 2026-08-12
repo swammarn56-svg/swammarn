@@ -5,115 +5,62 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#111827">
 <link rel="manifest" href="./manifest.webmanifest">
-<link rel="stylesheet" href="./css/style.css">
+<link rel="stylesheet" href="./css/style.css?v=20260813">
 <title>Bakery ERP · Phase 2</title>
 </head>
 <body>
 <header class="topbar">
   <div><strong>Bakery ERP</strong><small id="appSubtitle">Phase 2 · Sales & Reports</small></div>
-  <div class="top-actions"><button id="langBtn" class="ghost">မြန်မာ</button><span id="connectionStatus" class="status">Checking…</span><button id="logoutBtn" class="ghost hidden">Logout</button></div>
+  <div class="top-actions"><button id="langBtn" class="ghost">English</button><span id="connectionStatus" class="status">Checking…</span><button id="logoutBtn" class="ghost hidden">Logout</button></div>
 </header>
-
 <main>
 <section id="authView" class="auth-card hidden">
   <h1 data-i18n="signIn">Sign in</h1>
   <p class="muted" data-i18n="authRequired">Supabase Auth account required.</p>
   <form id="loginForm">
-    <label data-i18n="email">Email<input id="email" type="email" required></label>
-    <label data-i18n="password">Password<input id="password" type="password" required></label>
-    <button class="primary" data-i18n="signIn">Sign in</button>
+    <label data-i18n="email">Email<input id="email" type="email" autocomplete="username" required></label>
+    <label data-i18n="password">Password<input id="password" type="password" autocomplete="current-password" required></label>
+    <button type="submit" class="primary" data-i18n="signIn">Sign in</button>
     <p id="authMessage" class="message"></p>
   </form>
 </section>
-
 <section id="mainView" class="hidden">
-  <div class="hero">
-    <div><h1 id="pageTitle"></h1><p id="pageSub" class="muted"></p></div>
-    <button id="primaryAction" class="primary"></button>
-  </div>
+  <div class="hero"><div><h1 id="pageTitle"></h1><p id="pageSub" class="muted"></p></div><button id="primaryAction" type="button" class="primary"></button></div>
   <nav class="tabs" id="tabs">
-    <button data-page="dashboard">Dashboard</button>
-    <button data-page="items">Item Dashboard</button>
-    <button data-page="purchases">Purchase</button>
-    <button data-page="recipes">Recipe</button>
-    <button data-page="orders">Order</button>
-    <button data-page="production">Production</button>
-    <button data-page="packaging">Packaging</button>
-    <button data-page="sales">Sale</button>
-    <button data-page="reports">Reports</button>
-    <button data-page="more">More</button>
+    <button type="button" data-page="dashboard">Dashboard</button><button type="button" data-page="items">Item Dashboard</button>
+    <button type="button" data-page="purchases">Purchase</button><button type="button" data-page="recipes">Recipe</button>
+    <button type="button" data-page="orders">Order</button><button type="button" data-page="production">Production</button>
+    <button type="button" data-page="packaging">Packaging</button><button type="button" data-page="sales">Sale</button>
+    <button type="button" data-page="reports">Reports</button><button type="button" data-page="more">More</button>
   </nav>
   <section id="content"></section>
 </section>
 </main>
-
 <dialog id="dialog">
 <form id="form" class="dialog-card">
   <div class="dialog-head"><h2 id="dialogTitle"></h2><button type="button" id="closeDialog" class="icon">×</button></div>
   <div id="formBody"></div><p id="formMessage" class="message"></p>
-  <div class="dialog-actions"><button type="button" id="cancelDialog" data-i18n="cancel">Cancel</button><button class="primary" data-i18n="save">Save</button></div>
+  <div class="dialog-actions"><button type="button" id="cancelDialog">Cancel</button><button type="submit" class="primary">Save</button></div>
 </form>
 </dialog>
-
 <script>
 (function(){
-  var status=document.getElementById("connectionStatus");
-  var failed=false;
-  function setStatus(text, danger){
-    if(status){status.textContent=text; if(danger) status.className="status danger-text";}
-  }
-  function loadScript(src, cb, timeout){
-    var s=document.createElement("script");
-    s.src=src;
-    s.async=true;
-    var done=false;
-    var timer=setTimeout(function(){
-      if(done)return; done=true; s.remove(); cb(new Error("Timeout loading "+src));
-    }, timeout||7000);
-    s.onload=function(){if(done)return;done=true;clearTimeout(timer);cb(null)};
-    s.onerror=function(){if(done)return;done=true;clearTimeout(timer);s.remove();cb(new Error("Failed loading "+src))};
+  var status=document.getElementById("connectionStatus"), failed=false, V="20260813";
+  function setStatus(t,d){if(status){status.textContent=t;if(d)status.className="status danger-text";}}
+  function load(src,cb){
+    var s=document.createElement("script"); s.src=src+"?v="+V; s.async=false;
+    s.onload=function(){cb(null)}; s.onerror=function(){s.remove();cb(new Error("Failed loading "+src));};
     document.head.appendChild(s);
   }
-  function loadChain(){
-    loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2", function(err){
-      if(err){
-        setStatus("Supabase CDN 1 မရ — fallback စမ်းနေသည်…", true);
-        return loadScript("https://unpkg.com/@supabase/supabase-js@2", function(err2){
-          if(err2)return fail("Supabase SDK မတက်ပါ။ Internet/CDN ကိုစစ်ပါ။");
-          startApp();
-        });
-      }
-      startApp();
-    });
+  load("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",function(e){
+    if(e)return load("https://unpkg.com/@supabase/supabase-js@2",function(e2){if(e2)return fail("Supabase SDK မတက်ပါ။");start();});
+    start();
+  });
+  function start(){
+    load("./js/config.js",function(e){if(e)return fail("config.js မတက်ပါ။");load("./js/utils.js",function(e){if(e)return fail("utils.js မတက်ပါ။");load("./js/supabase.js",function(e){if(e)return fail("supabase.js မတက်ပါ။");load("./js/app-safe.js",function(e){if(e)return fail("app.js မတက်ပါ။");});});});});
   }
-  function startApp(){
-    if(!window.supabase || !window.supabase.createClient){
-      return fail("Supabase SDK မတွေ့ပါ။");
-    }
-    var list=["./js/config.js","./js/utils.js","./js/supabase.js","./js/app.js"];
-    function next(i){
-      if(i>=list.length)return;
-      loadScript(list[i], function(err){
-        if(err)return fail("File မတက်ပါ: "+list[i]);
-        next(i+1);
-      });
-    }
-    next(0);
-  }
-  function fail(msg){
-    failed=true;
-    setStatus(msg,true);
-    var a=document.getElementById("authView");
-    if(a)a.classList.remove("hidden");
-    var m=document.getElementById("mainView");
-    if(m)m.classList.add("hidden");
-  }
-  setTimeout(function(){
-    if(!window.bakerySupabase && !window.supabase && !failed){
-      setStatus("JavaScript/Supabase မတက်ပါ — network/CDN ကိုစစ်ပါ", true);
-    }
-  },12000);
-  loadChain();
+  function fail(m){failed=true;setStatus(m,true);document.getElementById("authView")?.classList.remove("hidden");}
 })();
 </script>
 </body>
+</html>
