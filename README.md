@@ -1,24 +1,19 @@
-# Bakery ERP v14 — Item Dashboard Module
+# Bakery ERP v14 — Phase 1 Core Operations
 
-This ZIP replaces the previous foundation files with a working Item Dashboard connected to Supabase.
+This build extends the working Item Dashboard into the Phase 1 core flow:
+Items → Purchase → Inventory Ledger → Recipes → Orders → Production/Packaging Operations.
 
-## Before opening the app
+## Supabase
+The existing `schema.sql` and `rls.sql` remain compatible. Do not rerun them if already applied.
 
-1. `schema.sql` and `rls.sql` should already have been run in Supabase.
-2. Create a user in Supabase Authentication → Users.
-3. Sign in from the app using that account.
-4. Add an item and verify it appears in the `items` table.
+## Purchase
+Example: 40 kg at 500,000 MMK becomes 40,000 g and 12.50 MMK/g when the item's base unit is g.
 
-## Item rules
+A purchase is a draft until **Confirm**. Confirming it marks the purchase confirmed/applied and writes one inventory-ledger receipt.
 
-- Base unit is `g` or `pcs`.
-- Purchase unit can be `g`, `kg`, `pcs`, `box`, or `pack`.
-- `unit_factor_to_base` stores the conversion to the item's base unit.
-- Sale/Production/Packaging flags are stored on the item.
-- Deactivation keeps historical rows while removing the item from active workflows.
-- The next Order module should query only `sale_enabled = true` items.
+## Recipe / Order
+Recipes define component base quantities per one base unit of output. Orders only offer active items with `sale_enabled=true`. Issuing an order reads the active recipe, calculates component issued quantities, records daily operations, and writes negative inventory-ledger movements using the current weighted average cost.
 
-## Security
-
-Only the Supabase publishable key is shipped to the browser. Do not add a service-role/secret key.
-The current RLS policies require authenticated users. Role-specific policies should be tightened before production.
+## Important
+The browser uses only the Supabase publishable key. Never add a service-role/secret key.
+Phase 2 will add Sales, reporting, monthly closing, permissions, audit hardening and final UX polish.
