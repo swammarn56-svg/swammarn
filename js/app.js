@@ -1,7 +1,23 @@
-import { supabase } from "./supabase.js";
-import { qty, escapeHtml } from "./utils.js";
-
+const supabase = window.bakerySupabase;
+const qty = window.qty;
+const escapeHtml = window.escapeHtml;
 const $=s=>document.querySelector(s);
+window.addEventListener("error", e => {
+  const el=document.querySelector("#connectionStatus");
+  if(el && /Supabase|module|import|bakery/i.test(e.message||"")) {
+    el.textContent="App error";
+    el.className="status danger-text";
+  }
+});
+if(!supabase){
+  const st=document.querySelector("#connectionStatus");
+  if(st){st.textContent="Supabase SDK error";st.className="status danger-text";}
+  const main=document.querySelector("#mainView");
+  if(main) main.classList.remove("hidden");
+  const c=document.querySelector("#content");
+  if(c) c.innerHTML='<div class="card"><strong>App could not start</strong><p class="muted">'+escapeHtml(window.__BAKERY_BOOT_ERROR||"Supabase SDK did not load.")+'</p><p class="muted">Please refresh once after GitHub Pages finishes deploying.</p></div>';
+  throw new Error(window.__BAKERY_BOOT_ERROR||"Supabase SDK did not load");
+}
 const content=$("#content"), status=$("#connectionStatus"), dialog=$("#dialog"), form=$("#form"), title=$("#dialogTitle"), body=$("#formBody"), msg=$("#formMessage");
 let page="dashboard";
 let items=[], purchases=[], recipes=[], recipeLines=[], orders=[], orderLines=[], operations=[], sales=[], saleLines=[], ledger=[];
@@ -257,5 +273,21 @@ content.onclick=async e=>{
  if(b.dataset.saveOp){saveOperationRow(b);return}
 };
 supabase.auth.onAuthStateChange((_e,s)=>{setSignedIn(!!s);if(s)loadAll()});
-applyLanguage();
-const {data:{session}}=await supabase.auth.getSession();setSignedIn(!!session);if(session)loadAll();
+async function boot(){
+  applyLanguage();
+  const {data:{session}, error}=await supabase.auth.getSession();
+  if(error){
+    const st=document.querySelector("#connectionStatus");
+    if(st){st.textContent="Auth check failed";st.className="status danger-text";}
+    return;
+  }
+  setSignedIn(!!session);
+  if(session) await loadAll();
+}
+boot().catch(e=>{
+  console.error(e);
+  const st=document.querySelector("#connectionStatus");
+  if(st){st.textContent="App error";st.className="status danger-text";}
+  const c=document.querySelector("#content");
+  if(c)c.innerHTML='<div class="card"><strong>App startup error</strong><p class="muted">'+escapeHtml(e?.message||String(e))+'</p></div>';
+});
