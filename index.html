@@ -55,31 +55,25 @@
 </form>
 </dialog>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="./js/config.js" defer></script>
+<script src="./js/utils.js" defer></script>
+<script src="./js/supabase.js" defer></script>
+<script src="./js/app.js" defer></script>
 <script>
 (function(){
-  var s=document.createElement("script");
-  s.src="https://unpkg.com/@supabase/supabase-js@2";
-  s.async=false;
-  s.onload=function(){
-    var c=document.createElement("script"); c.src="./js/config.js"; c.onload=function(){
-      var u=document.createElement("script"); u.src="./js/utils.js"; u.onload=function(){
-        var sb=document.createElement("script"); sb.src="./js/supabase.js"; sb.onload=function(){
-          var a=document.createElement("script"); a.src="./js/app.js"; document.body.appendChild(a);
-        }; document.body.appendChild(sb);
-      }; document.body.appendChild(u);
-    }; document.body.appendChild(c);
-  };
-  s.onerror=function(){
-    var f=document.createElement("script");
-    f.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
-    f.onload=s.onload;
-    f.onerror=function(){
-      document.getElementById("connectionStatus").textContent="Supabase SDK load failed";
-      document.getElementById("connectionStatus").className="status danger-text";
-    };
-    document.head.appendChild(f);
-  };
-  document.head.appendChild(s);
+  window.setTimeout(function(){
+    var s=document.getElementById("connectionStatus");
+    if(s && /Checking|Loading/.test(s.textContent||"")){
+      s.textContent="JavaScript/Supabase မတက်ပါ — browser refresh လုပ်ပါ";
+      s.className="status danger-text";
+      var main=document.getElementById("mainView");
+      if(main && main.classList.contains("hidden")){
+        var a=document.getElementById("authView");
+        if(a && a.classList.contains("hidden")) a.classList.remove("hidden");
+      }
+    }
+  }, 8000);
 })();
 </script>
 </body>
